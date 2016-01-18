@@ -1,5 +1,12 @@
 FROM php:5.6-apache
-
+MAINTAINER Fabio Montefuscolo <fabio.montefuscolo@gmail.com>
+#
+# It is based on official Wordpress Dockerfile, but I put
+# files direct on /var/www/html instead /usr/src/wordpress.
+# You can mount your wp-content, wp-config.php and .htaccess
+# and the entrypoint script will not overwrte your files.
+# It helps me on theme and plugin development.
+#
 RUN a2enmod rewrite expires
 
 # install the PHP extensions we need
