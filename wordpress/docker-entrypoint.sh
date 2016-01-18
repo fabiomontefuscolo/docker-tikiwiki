@@ -1,7 +1,7 @@
 #!/bin/bash
 
 keygen() {
-    cat /dev/urandom | tr -dc '[:print:'] | tr "\\\\" "-" | tr "'" "-" | head -c64;
+    cat /dev/urandom | tr -dc '[:print:]' | tr "\\\\" "-" | tr "'" "-" | head -c64;
 }
 
 DB_USER="${WORDPRESS_DB_USER:=${MYSQL_ENV_MYSQL_USER:-root}}";
@@ -9,7 +9,9 @@ DB_NAME="${WORDPRESS_DB_NAME:=${MYSQL_ENV_MYSQL_DATABASE:-wordpress}}";
 DB_PASSWORD="${WORDPRESS_DB_PASSWORD:=$MYSQL_ENV_MYSQL_ROOT_PASSWORD}";
 DB_HOST="${WORDPRESS_DB_HOST:-mysql}";
 
-# create wp-config.php
+#
+# Create wp-config.php
+#
 if ! [ -e "/var/www/html/wp-config.php" ];
 then
     cat > /var/www/html/wp-config.php << EOF
@@ -39,7 +41,26 @@ then
 EOF
 fi
 
-# create database if not exists
+#
+# Create .htaccess
+#
+if ! [ -e "/var/www/html/.htaccess" ];
+then
+    cat > /var/www/html/.htaccess << EOF
+<IfModule mod_rewrite.c>
+RewriteEngine On
+RewriteBase /
+RewriteRule ^index\.php$ - [L]
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule . /index.php [L]
+</IfModule>
+EOF
+fi
+
+#
+# Create database if not exists
+#
 php -r "(new mysqli('$DB_HOST', '$DB_USER', '$DB_PASSWORD'))->query('create database if not exists $DB_NAME');"
 
 exec "$@"
