@@ -58,9 +58,40 @@ RewriteRule . /index.php [L]
 EOF
 fi
 
+
+#
+# Should I respect the owner of mounted volumes
+#
+volume=$(mount -l | awk '/var\/www\/html/{ print $3; exit; }')
+if [ -n "$volume" ];
+then
+    uid=$(stat -c %u "$volume")
+    gid=$(stat -c %g "$volume")
+fi
+
+if [ -n "$uid" ];
+then
+    user=$(awk -F: "/:$uid:[0-9]+:/{ print \$1}" /etc/passwd)
+    group=$(awk -F: "/:x:$gid:/{ print \$1}" /etc/group)
+
+    if [ -z "$group" ];
+    then
+        usermod -g "$gid" www-data
+    fi
+
+    if [ -z "$user" ];
+    then
+        usermod -u "$uid" www-data
+    fi
+else
+    chown www-data:www-data /var/www/html/.htaccess
+    chown www-data:www-data /var/www/html/wp-config.php
+    chown -R www-data:www-data /var/www/html/wp-content
+fi
+
+
 #
 # Create database if not exists
 #
 php -r "(new mysqli('$DB_HOST', '$DB_USER', '$DB_PASSWORD'))->query('create database if not exists $DB_NAME');"
-
 exec "$@"
