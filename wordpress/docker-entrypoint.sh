@@ -6,7 +6,7 @@ keygen() {
 
 DB_USER="${WORDPRESS_DB_USER:=${MYSQL_ENV_MYSQL_USER:-root}}";
 DB_NAME="${WORDPRESS_DB_NAME:=${MYSQL_ENV_MYSQL_DATABASE:-wordpress}}";
-DB_PASSWORD="${WORDPRESS_DB_PASSWORD:=$MYSQL_ENV_MYSQL_ROOT_PASSWORD}";
+DB_PASSWORD="${WORDPRESS_DB_PASSWORD:=${MYSQL_ENV_MYSQL_PASS:$MYSQL_ENV_MYSQL_ROOT_PASSWORD}}";
 DB_HOST="${WORDPRESS_DB_HOST:-mysql}";
 
 #
@@ -56,6 +56,11 @@ RewriteCond %{REQUEST_FILENAME} !-d
 RewriteRule . /index.php [L]
 </IfModule>
 EOF
+
+    if [ "$WORDPRESS_WP_DEBUG" = "true" ];
+    then
+        echo "php_flag opcache.enable Off" >> /var/www/html/.htaccess
+    fi
 fi
 
 
@@ -91,7 +96,14 @@ fi
 
 
 #
-# Create database if not exists
+# Setup database and user
 #
-php -r "(new mysqli('$DB_HOST', '$DB_USER', '$DB_PASSWORD'))->query('create database if not exists $DB_NAME');"
+php << EOF
+<?php
+    \$con = new mysqli($DB_HOST, 'root', '$MYSQL_ENV_MYSQL_ROOT_PASSWORD');
+    \$con->query("create database if not exists '$DB_NAME'");
+    \$con->query("grant all privileges on \`$DB_NAME\`.* to '$DB_USER'@'%' identified by '$DB_PASSWORD'");
+    \$con->query("flush privileges");
+EOF
+
 exec "$@"
