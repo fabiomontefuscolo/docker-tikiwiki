@@ -1,12 +1,6 @@
 FROM php:5.6-apache
 MAINTAINER Fabio Montefuscolo <fabio.montefuscolo@gmail.com>
-#
-# It is based on official Wordpress Dockerfile, but I put
-# files direct on /var/www/html instead /usr/src/wordpress.
-# You can mount your wp-content, wp-config.php and .htaccess
-# and the entrypoint script will not overwrte your files.
-# It helps me on theme and plugin development.
-#
+
 RUN a2enmod rewrite expires
 
 # install the PHP extensions we need
@@ -40,6 +34,8 @@ RUN curl -o /tmp/moodle-2.7.zip 'https://download.moodle.org/download.php/direct
 
 COPY moodle-config.php /var/www/html/config.php
 COPY docker-entrypoint.sh /entrypoint.sh
+
+VOLUME ["/var/www/moodledata", "/var/www/html/local"]
 
 ENTRYPOINT ["/entrypoint.sh"]
 CMD ["apache2-foreground"]
