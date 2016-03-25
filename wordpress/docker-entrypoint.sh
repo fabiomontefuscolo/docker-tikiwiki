@@ -6,7 +6,7 @@ keygen() {
 
 DB_USER="${WORDPRESS_DB_USER:=${MYSQL_ENV_MYSQL_USER:-root}}";
 DB_NAME="${WORDPRESS_DB_NAME:=${MYSQL_ENV_MYSQL_DATABASE:-wordpress}}";
-DB_PASSWORD="${WORDPRESS_DB_PASSWORD:=${MYSQL_ENV_MYSQL_PASS:$MYSQL_ENV_MYSQL_ROOT_PASSWORD}}";
+DB_PASSWORD="${WORDPRESS_DB_PASSWORD:=${MYSQL_ENV_MYSQL_PASSWORD:$MYSQL_ENV_MYSQL_ROOT_PASSWORD}}";
 DB_HOST="${WORDPRESS_DB_HOST:-mysql}";
 
 #
@@ -88,11 +88,11 @@ then
     then
         usermod -u "$uid" www-data
     fi
-else
-    chown www-data:www-data /var/www/html/.htaccess
-    chown www-data:www-data /var/www/html/wp-config.php
-    chown -R www-data:www-data /var/www/html/wp-content
 fi
+
+chown www-data:www-data /var/www/html/.htaccess
+chown www-data:www-data /var/www/html/wp-config.php
+chown -R www-data:www-data /var/www/html/wp-content
 
 
 #
@@ -100,10 +100,12 @@ fi
 #
 php << EOF
 <?php
-    \$con = new mysqli($DB_HOST, 'root', '$MYSQL_ENV_MYSQL_ROOT_PASSWORD');
-    \$con->query("create database if not exists '$DB_NAME'");
-    \$con->query("grant all privileges on \`$DB_NAME\`.* to '$DB_USER'@'%' identified by '$DB_PASSWORD'");
-    \$con->query("flush privileges");
+    \$con = @new mysqli($DB_HOST, 'root', '$MYSQL_ENV_MYSQL_ROOT_PASSWORD');
+    if(\$con->connect_errno === 0) {
+        \$con->query("create database if not exists '$DB_NAME'");
+        \$con->query("grant all privileges on \`$DB_NAME\`.* to '$DB_USER'@'%' identified by '$DB_PASSWORD'");
+        \$con->query("flush privileges");
+    }
 EOF
 
 exec "$@"
