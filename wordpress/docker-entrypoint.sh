@@ -34,6 +34,8 @@ then
 
     \$table_prefix  = '${WORDPRESS_TABLE_PREFIX:-wp}_';
     define('WP_DEBUG', ${WORDPRESS_WP_DEBUG:-false});
+    define('WP_DEBUG_LOG', ${WORDPRESS_WP_DEBUG_LOG:-false});
+    define('WP_DEBUG_DISPLAY', ${WORDPRESS_WP_DEBUG_DISPLAY:-true});
 
     if ( !defined('ABSPATH') )
         define('ABSPATH', dirname(__FILE__) . '/');
@@ -47,6 +49,7 @@ fi
 if ! [ -e "/var/www/html/.htaccess" ];
 then
     cat > /var/www/html/.htaccess << EOF
+# BEGIN WordPress
 <IfModule mod_rewrite.c>
 RewriteEngine On
 RewriteBase /
@@ -55,6 +58,7 @@ RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME} !-d
 RewriteRule . /index.php [L]
 </IfModule>
+# END WordPress
 EOF
 
     if [ "$WORDPRESS_WP_DEBUG" = "true" ];
