@@ -10,7 +10,7 @@ MAINTAINER Fabio Montefuscolo <fabio.montefuscolo@gmail.com>
 RUN a2enmod rewrite expires ssl
 
 # install the PHP extensions we need
-RUN apt-get update && apt-get install -y libpng12-dev libjpeg-dev && rm -rf /var/lib/apt/lists/* \
+RUN apt-get update && apt-get install -y unzip libpng12-dev libjpeg-dev && rm -rf /var/lib/apt/lists/* \
     && docker-php-ext-configure gd --with-png-dir=/usr --with-jpeg-dir=/usr \
     && docker-php-ext-install gd mysqli opcache
 
@@ -25,11 +25,11 @@ RUN { \
         echo 'opcache.enable_cli=1'; \
     } > /usr/local/etc/php/conf.d/opcache-recommended.ini
 
-RUN curl -o wp-cli.phar 'https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar?0.23.0' \
+RUN curl -o wp-cli.phar 'https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar?0.23.1' \
     && chmod +x wp-cli.phar \
     && mv wp-cli.phar /usr/local/bin/wp
 
-RUN wp core download --path=/var/www/html/ --version=4.4.2 --allow-root
+RUN wp core download --path=/var/www/html/ --version=4.5.3 --allow-root
 COPY docker-entrypoint.sh /entrypoint.sh
 
 RUN openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout localhost.key -out localhost.crt \
@@ -37,6 +37,7 @@ RUN openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout localhost.key -o
     && mv localhost.key /etc/ssl/private/localhost.key \
     && mv localhost.crt /etc/ssl/certs/localhost.crt
 COPY default-ssl.conf /etc/apache2/sites-enabled
+RUN mkdir -p /docker-entrypoint-extra/
 
 EXPOSE 80 443
 

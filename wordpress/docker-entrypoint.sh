@@ -3,6 +3,7 @@
 keygen() {
     cat /dev/urandom | tr -dc '[:print:]' | tr "\\\\" "-" | tr "'" "-" | head -c64;
 }
+PHP=`which php`
 
 DB_USER="${WORDPRESS_DB_USER:=${MYSQL_ENV_MYSQL_USER:-root}}";
 DB_NAME="${WORDPRESS_DB_NAME:=${MYSQL_ENV_MYSQL_DATABASE:-wordpress}}";
@@ -111,5 +112,14 @@ php << EOF
         \$con->query("flush privileges");
     }
 EOF
+
+for f in /docker-entrypoint-extra/*; do
+    case "$f" in
+        *.sh)     echo "$0: running $f"; . "$f" ;;
+        *.php)    echo "$0: running $f"; "${PHP}" < "$f"; echo ;;
+        *)        echo "$0: ignoring $f" ;;
+    esac
+    echo
+done
 
 exec "$@"
