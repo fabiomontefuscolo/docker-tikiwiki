@@ -37,7 +37,7 @@ then
     gid=$(stat -c %g "$volume")
 fi
 
-if [ -n "$uid" ];
+if [ -n "$uid" ] && [ "$WORDPRESS_WP_DEBUG" = "true" ];
 then
     user=$(awk -F: "/:$uid:[0-9]+:/{ print \$1}" /etc/passwd)
     group=$(awk -F: "/:x:$gid:/{ print \$1}" /etc/group)
@@ -49,7 +49,7 @@ then
 
     if [ -z "$user" ];
     then
-        usermod -u "$uid" www-data
+        usermod -u "$uid" wordpress
     fi
 else
     uid=$(awk -F: '/^www-data/{ print $3 }' /etc/passwd)
