@@ -31,14 +31,18 @@ RUN /bin/bash htaccess.sh
 RUN chown -R root:root /var \
     && find /var/www/html -type f -exec chmod 644 {} \; \
     && find /var/www/html -type d -exec chmod 755 {} \; \
+    && chown -R www-data db \
     && chown -R www-data dump \
     && chown -R www-data img/wiki \
     && chown -R www-data img/wiki_up \
     && chown -R www-data img/trackers \
     && chown -R www-data modules/cache \
+    && chown -R www-data styles \
     && chown -R www-data temp \
     && chown -R www-data temp/cache \
-    && chown -R www-data templates_c
+    && chown -R www-data templates \
+    && chown -R www-data templates_c \
+    && chown -R www-data whelp
 
 COPY docker-entrypoint.sh /entrypoint.sh
 
