@@ -31,6 +31,7 @@ RUN /bin/bash htaccess.sh
 RUN chown -R root:root /var \
     && find /var/www/html -type f -exec chmod 644 {} \; \
     && find /var/www/html -type d -exec chmod 755 {} \; \
+    && chown -R www-data dump \
     && chown -R www-data img/wiki \
     && chown -R www-data img/wiki_up \
     && chown -R www-data img/trackers \
