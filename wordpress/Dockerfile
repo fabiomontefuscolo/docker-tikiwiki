@@ -1,43 +1,23 @@
-FROM php:5.6-apache
+FROM montefuscolo/php
 MAINTAINER Fabio Montefuscolo <fabio.montefuscolo@gmail.com>
-#
-# It is based on official Wordpress Dockerfile, but I put
-# files direct on /var/www/html instead /usr/src/wordpress.
-# You can mount your wp-content, wp-config.php and .htaccess
-# and the entrypoint script will not overwrte your files.
-# It helps me on theme and plugin development.
-#
-RUN a2enmod rewrite expires ssl
-
-# install the PHP extensions we need
-RUN apt-get update && apt-get install -y unzip libpng12-dev libjpeg-dev && rm -rf /var/lib/apt/lists/* \
-    && docker-php-ext-configure gd --with-png-dir=/usr --with-jpeg-dir=/usr \
-    && docker-php-ext-install gd mysqli opcache
-
-# set recommended PHP.ini settings
-# see https://secure.php.net/manual/en/opcache.installation.php
-RUN { \
-        echo 'opcache.memory_consumption=128'; \
-        echo 'opcache.interned_strings_buffer=8'; \
-        echo 'opcache.max_accelerated_files=4000'; \
-        echo 'opcache.revalidate_freq=60'; \
-        echo 'opcache.fast_shutdown=1'; \
-        echo 'opcache.enable_cli=1'; \
-    } > /usr/local/etc/php/conf.d/opcache-recommended.ini
 
 RUN curl -o wp-cli.phar 'https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar?0.23.1' \
     && chmod +x wp-cli.phar \
     && mv wp-cli.phar /usr/local/bin/wp
 
-RUN wp core download --path=/var/www/html/ --version=4.5.3 --allow-root
-COPY docker-entrypoint.sh /entrypoint.sh
+RUN curl -o installer.php "https://getcomposer.org/installer" \
+    && php installer.php --install-dir=/usr/local/bin/ --filename=composer \
+    && rm installer.php
 
-RUN openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout localhost.key -out localhost.crt \
-        -subj "/C=BR/ST=SP/L=São Roque/O=Hacklab/OU=Development/CN=Dev/emailAddress=a@b.cd" \
-    && mv localhost.key /etc/ssl/private/localhost.key \
-    && mv localhost.crt /etc/ssl/certs/localhost.crt
-COPY default-ssl.conf /etc/apache2/sites-enabled
+RUN wp core download --path=/var/www/html/ --version=4.5.3 --allow-root
+RUN chown -R root:root /var/www/html/ \
+    && chown -R www-data:www-data /var/www/html/wp-content
+
+COPY htaccess /var/www/html/.htaccess
+COPY wp-config.php /var/www/html/wp-config.php
+
 RUN mkdir -p /docker-entrypoint-extra/
+COPY docker-entrypoint.sh /entrypoint.sh
 
 EXPOSE 80 443
 

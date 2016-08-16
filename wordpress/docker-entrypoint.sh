@@ -3,69 +3,27 @@
 keygen() {
     cat /dev/urandom | tr -dc '[:print:]' | tr "\\\\" "-" | tr "'" "-" | head -c64;
 }
-PHP=`which php`
 
-DB_USER="${WORDPRESS_DB_USER:=${MYSQL_ENV_MYSQL_USER:-root}}";
-DB_NAME="${WORDPRESS_DB_NAME:=${MYSQL_ENV_MYSQL_DATABASE:-wordpress}}";
-DB_PASSWORD="${WORDPRESS_DB_PASSWORD:=${MYSQL_ENV_MYSQL_PASSWORD:$MYSQL_ENV_MYSQL_ROOT_PASSWORD}}";
-DB_HOST="${WORDPRESS_DB_HOST:-mysql}";
+export WORDPRESS_AUTH_KEY="${WORDPRESS_AUTH_KEY:-$(keygen)}"
+export WORDPRESS_SECURE_AUTH_KEY="${WORDPRESS_SECURE_AUTH_KEY:-$(keygen)}"
+export WORDPRESS_LOGGED_IN_KEY="${WORDPRESS_LOGGED_IN_KEY:-$(keygen)}"
+export WORDPRESS_NONCE_KEY="${WORDPRESS_NONCE_KEY:-$(keygen)}"
+export WORDPRESS_AUTH_SALT="${WORDPRESS_AUTH_SALT:-$(keygen)}"
+export WORDPRESS_SECURE_AUTH_SALT="${WORDPRESS_SECURE_AUTH_SALT:-$(keygen)}"
+export WORDPRESS_LOGGED_IN_SALT="${WORDPRESS_LOGGED_IN_SALT:-$(keygen)}"
+export WORDPRESS_NONCE_SALT="${WORDPRESS_NONCE_SALT:-$(keygen)}"
 
-#
-# Create wp-config.php
-#
-if ! [ -e "/var/www/html/wp-config.php" ];
+
+if [ "$WORDPRESS_WP_DEBUG" != "true" ] && [ "$OPCACHE" != "false" ];
 then
-    cat > /var/www/html/wp-config.php << EOF
-<?php
-    define('DB_USER',     '$DB_USER');
-    define('DB_NAME',     '$DB_NAME');
-    define('DB_PASSWORD', '$DB_PASSWORD');
-    define('DB_HOST',     '$DB_HOST');
-    define('DB_CHARSET',  '${WORDPRESS_DB_CHARSET:-utf8}');
-    define('DB_COLLATE',  '${WORDPRESS_DB_COLLATE}');
-
-    define('AUTH_KEY',         '${WORDPRESS_AUTH_KEY:-$(keygen)}');
-    define('SECURE_AUTH_KEY',  '${WORDPRESS_SECURE_AUTH_KEY:-$(keygen)}');
-    define('LOGGED_IN_KEY',    '${WORDPRESS_LOGGED_IN_KEY:-$(keygen)}');
-    define('NONCE_KEY',        '${WORDPRESS_NONCE_KEY:-$(keygen)}');
-    define('AUTH_SALT',        '${WORDPRESS_AUTH_SALT:-$(keygen)}');
-    define('SECURE_AUTH_SALT', '${WORDPRESS_SECURE_AUTH_SALT:-$(keygen)}');
-    define('LOGGED_IN_SALT',   '${WORDPRESS_LOGGED_IN_SALT:-$(keygen)}');
-    define('NONCE_SALT',       '${WORDPRESS_NONCE_SALT:-$(keygen)}');
-
-    \$table_prefix  = '${WORDPRESS_TABLE_PREFIX:-wp}_';
-    define('WP_DEBUG', ${WORDPRESS_WP_DEBUG:-false});
-    define('WP_DEBUG_LOG', ${WORDPRESS_WP_DEBUG_LOG:-false});
-    define('WP_DEBUG_DISPLAY', ${WORDPRESS_WP_DEBUG_DISPLAY:-true});
-
-    if ( !defined('ABSPATH') )
-        define('ABSPATH', dirname(__FILE__) . '/');
-    require_once(ABSPATH . 'wp-settings.php');
+    cat > /usr/local/etc/php/conf.d/opcache-recommended.ini << EOF
+opcache.memory_consumption=128
+opcache.interned_strings_buffer=8
+opcache.max_accelerated_files=4000
+opcache.revalidate_freq=60
+opcache.fast_shutdown=1
+opcache.enable_cli=1
 EOF
-fi
-
-#
-# Create .htaccess
-#
-if ! [ -e "/var/www/html/.htaccess" ];
-then
-    cat > /var/www/html/.htaccess << EOF
-# BEGIN WordPress
-<IfModule mod_rewrite.c>
-RewriteEngine On
-RewriteBase /
-RewriteRule ^index\.php$ - [L]
-RewriteCond %{REQUEST_FILENAME} !-f
-RewriteCond %{REQUEST_FILENAME} !-d
-RewriteRule . /index.php [L]
-</IfModule>
-# END WordPress
-EOF
-
-    if [ "$WORDPRESS_WP_DEBUG" = "true" ];
-    then
-        echo "php_flag opcache.enable Off" >> /var/www/html/.htaccess
-    fi
 fi
 
 
@@ -93,30 +51,15 @@ then
     then
         usermod -u "$uid" www-data
     fi
+else
+    uid=$(awk -F: '/^www-data/{ print $3 }' /etc/passwd)
 fi
 
-chown www-data:www-data /var/www/html/.htaccess
-chown www-data:www-data /var/www/html/wp-config.php
-chown -R www-data:www-data /var/www/html/wp-content
-
-
-#
-# Setup database and user
-#
-php << EOF
-<?php
-    \$con = @new mysqli($DB_HOST, 'root', '$MYSQL_ENV_MYSQL_ROOT_PASSWORD');
-    if(\$con->connect_errno === 0) {
-        \$con->query("create database if not exists '$DB_NAME'");
-        \$con->query("grant all privileges on \`$DB_NAME\`.* to '$DB_USER'@'%' identified by '$DB_PASSWORD'");
-        \$con->query("flush privileges");
-    }
-EOF
 
 for f in /docker-entrypoint-extra/*; do
     case "$f" in
         *.sh)     echo "$0: running $f"; . "$f" ;;
-        *.php)    echo "$0: running $f"; "${PHP}" < "$f"; echo ;;
+        *.php)    echo "$0: running $f"; "${PHP}" < "$f" ;;
         *)        echo "$0: ignoring $f" ;;
     esac
     echo
