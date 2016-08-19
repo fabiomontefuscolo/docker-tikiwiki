@@ -1,4 +1,4 @@
-FROM montefuscolo/php
+FROM montefuscolo/php:apache-php-7
 MAINTAINER Fabio Montefuscolo <fabio.montefuscolo@gmail.com>
 
 RUN curl -o wp-cli.phar 'https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar?0.24.1' \
