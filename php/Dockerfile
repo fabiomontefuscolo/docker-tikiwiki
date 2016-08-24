@@ -1,24 +1,21 @@
 FROM php:5.6-apache
 MAINTAINER Fabio Montefuscolo <fabio.montefuscolo@gmail.com>
-#
-# It is based on official Wordpress Dockerfile, but I put
-# files direct on /var/www/html instead /usr/src/wordpress.
-# You can mount your wp-content, wp-config.php and .htaccess
-# and the entrypoint script will not overwrte your files.
-# It helps me on theme and plugin development.
-#
+
 RUN a2enmod rewrite expires ssl
 
-# install the PHP extensions we need
+# Install the PHP extensions we need
 RUN apt-get update && apt-get install -y libpng12-dev libjpeg-dev libmemcached-dev && rm -rf /var/lib/apt/lists/*
 RUN docker-php-ext-configure gd --with-png-dir=/usr --with-jpeg-dir=/usr \
-    && docker-php-ext-install gd mysqli opcache zip \
-    && printf "\n" | pecl install memcached \
-    && curl -o installer.php https://getcomposer.org/installer \
-    && php installer.php \
-    && php installer.php \
-    && rm installer.php \
-    && mv composer.phar /usr/local/bin/composer
+    && docker-php-ext-install gd mysqli opcache zip
+
+# Support memcached
+RUN printf "\n" | pecl install memcached \
+    && echo 'extension=memcached.so' > /usr/local/etc/php/conf.d/pecl-memcached.ini
+
+# Composer facility
+RUN curl -s -o installer.php https://getcomposer.org/installer \
+    && php installer.php --install-dir=/usr/local/bin/ --filename=composer \
+    && rm installer.php
 
 COPY docker-entrypoint.sh /entrypoint.sh
 
