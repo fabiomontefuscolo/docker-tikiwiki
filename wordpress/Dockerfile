@@ -1,36 +1,24 @@
-FROM php:5.6-apache
+FROM montefuscolo/php
 MAINTAINER Fabio Montefuscolo <fabio.montefuscolo@gmail.com>
-#
-# It is based on official Wordpress Dockerfile, but I put
-# files direct on /var/www/html instead /usr/src/wordpress.
-# You can mount your wp-content, wp-config.php and .htaccess
-# and the entrypoint script will not overwrte your files.
-# It helps me on theme and plugin development.
-#
-RUN a2enmod rewrite expires
 
-# install the PHP extensions we need
-RUN apt-get update && apt-get install -y libpng12-dev libjpeg-dev && rm -rf /var/lib/apt/lists/* \
-    && docker-php-ext-configure gd --with-png-dir=/usr --with-jpeg-dir=/usr \
-    && docker-php-ext-install gd mysqli opcache
-
-# set recommended PHP.ini settings
-# see https://secure.php.net/manual/en/opcache.installation.php
-RUN { \
-        echo 'opcache.memory_consumption=128'; \
-        echo 'opcache.interned_strings_buffer=8'; \
-        echo 'opcache.max_accelerated_files=4000'; \
-        echo 'opcache.revalidate_freq=60'; \
-        echo 'opcache.fast_shutdown=1'; \
-        echo 'opcache.enable_cli=1'; \
-    } > /usr/local/etc/php/conf.d/opcache-recommended.ini
-
-RUN curl -o wp-cli.phar 'https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar?20160115' \
+RUN curl -o wp-cli.phar 'https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar?0.24.1' \
     && chmod +x wp-cli.phar \
     && mv wp-cli.phar /usr/local/bin/wp
 
-RUN wp core download --path=/var/www/html/ --allow-root
+RUN wp core download --path=/var/www/html/  --version=4.6 --locale=pt_BR --allow-root
+
+COPY htaccess /var/www/html/.htaccess
+COPY wp-config.php /var/www/html/wp-config.php
+
+RUN useradd --no-create-home --no-user-group --groups www-data wordpress
+RUN chown -R wordpress:root /var/www/html/ \
+    && chown -R wordpress:www-data /var/www/html/wp-content \
+    && find /var/www/html/wp-content -type d -exec chmod 775 {} \; \
+    && find /var/www/html/wp-content -type f -exec chmod 664 {} \;
+
+RUN mkdir -p /docker-entrypoint-extra/
 COPY docker-entrypoint.sh /entrypoint.sh
 
+EXPOSE 80 443
 ENTRYPOINT ["/entrypoint.sh"]
 CMD ["apache2-foreground"]
