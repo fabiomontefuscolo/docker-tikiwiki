@@ -10,16 +10,20 @@ MAINTAINER Fabio Montefuscolo <fabio.montefuscolo@gmail.com>
 RUN a2enmod rewrite expires ssl
 
 # install the PHP extensions we need
-RUN apt-get update && apt-get install -y libpng12-dev libjpeg-dev && rm -rf /var/lib/apt/lists/*
+RUN apt-get update && apt-get install -y libpng12-dev libjpeg-dev libmemcached-dev && rm -rf /var/lib/apt/lists/*
 RUN docker-php-ext-configure gd --with-png-dir=/usr --with-jpeg-dir=/usr \
-    && docker-php-ext-install gd mysqli opcache zip
+    && docker-php-ext-install gd mysqli opcache zip \
+    && printf "\n" | pecl install memcached \
+    && curl -o installer.php https://getcomposer.org/installer \
+    && php installer.php \
+    && php installer.php \
+    && rm installer.php \
+    && mv composer.phar /usr/local/bin/composer
 
 COPY docker-entrypoint.sh /entrypoint.sh
 
-RUN openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout localhost.key -out localhost.crt \
-        -subj "/C=BR/ST=SP/L=São Roque/O=Hacklab/OU=Development/CN=Dev/emailAddress=a@b.cd" \
-    && mv localhost.key /etc/ssl/private/localhost.key \
-    && mv localhost.crt /etc/ssl/certs/localhost.crt
+COPY localhost.key /etc/ssl/private/localhost.key
+COPY localhost.crt /etc/ssl/certs/localhost.crt
 COPY default-ssl.conf /etc/apache2/sites-enabled
 
 EXPOSE 80 443
