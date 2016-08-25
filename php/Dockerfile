@@ -8,9 +8,9 @@ RUN apt-get update && apt-get install -y libpng12-dev libjpeg-dev libmemcached-d
 RUN docker-php-ext-configure gd --with-png-dir=/usr --with-jpeg-dir=/usr \
     && docker-php-ext-install gd mysqli opcache zip
 
-# Support memcached
-RUN printf "\n" | pecl install memcached \
-    && echo 'extension=memcached.so' > /usr/local/etc/php/conf.d/pecl-memcached.ini
+# Support memcache
+RUN printf "yes\n" | pecl install memcache \
+    && echo 'extension=memcache.so' > /usr/local/etc/php/conf.d/pecl-memcache.ini
 
 # Composer facility
 RUN curl -s -o installer.php https://getcomposer.org/installer \
