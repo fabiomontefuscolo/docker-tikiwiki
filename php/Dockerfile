@@ -12,6 +12,10 @@ RUN docker-php-ext-configure gd --with-png-dir=/usr --with-jpeg-dir=/usr \
 RUN printf "yes\n" | pecl install memcache \
     && echo 'extension=memcache.so' > /usr/local/etc/php/conf.d/pecl-memcache.ini
 
+# Support memcached
+RUN printf "yes\n" | pecl install memcached \
+    && echo 'extension=memcached.so' > /usr/local/etc/php/conf.d/pecl-memcached.ini
+
 # Composer facility
 RUN curl -s -o installer.php https://getcomposer.org/installer \
     && php installer.php --install-dir=/usr/local/bin/ --filename=composer \
