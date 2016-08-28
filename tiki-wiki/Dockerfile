@@ -37,7 +37,7 @@ RUN chown -R root:root /var \
 
 COPY docker-entrypoint.sh /entrypoint.sh
 
-VOLUME ["/tmp", "/var/www/html/temp", "/var/www/html/modules/cache"]
+VOLUME ["/var/www/html/files/", "/var/www/html/img/wiki/", "/var/www/html/img/wiki_up/", "/var/www/html/img/trackers/"]
 
 EXPOSE 80 443
 ENTRYPOINT ["/entrypoint.sh"]
