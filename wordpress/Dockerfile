@@ -5,7 +5,7 @@ RUN curl -s -o wp-cli.phar 'https://raw.githubusercontent.com/wp-cli/builds/gh-p
     && chmod +x wp-cli.phar \
     && mv wp-cli.phar /usr/local/bin/wp
 
-RUN wp core download --path=/var/www/html/  --version=4.6 --locale=pt_BR --allow-root
+RUN wp core download --path=/var/www/html/  --version=4.6.1 --locale=pt_BR --allow-root
 
 COPY htaccess /var/www/html/.htaccess
 COPY wp-config.php /var/www/html/wp-config.php
@@ -18,6 +18,10 @@ RUN chown -R wordpress:root /var/www/html/ \
 
 RUN mkdir -p /docker-entrypoint-extra/
 COPY docker-entrypoint.sh /entrypoint.sh
+
+# `wp-cli --help` will use cat
+ENV PAGER /bin/cat
+RUN echo "alias wp='/usr/local/bin/wp --allow-root'" >> /root/.bashrc
 
 EXPOSE 80 443
 ENTRYPOINT ["/entrypoint.sh"]
