@@ -13,6 +13,11 @@ export SECURE_AUTH_SALT="${SECURE_AUTH_SALT:-$(keygen)}"
 export LOGGED_IN_SALT="${LOGGED_IN_SALT:-$(keygen)}"
 export NONCE_SALT="${NONCE_SALT:-$(keygen)}"
 
+# I used to use this
+if [ -n "$WORDPRESS_WP_DEBUG" ];
+then
+    export WP_DEBUG="$WORDPRESS_WP_DEBUG"
+fi
 
 if [ "$WP_DEBUG" != "true" ] && [ "$OPCACHE" != "false" ];
 then
