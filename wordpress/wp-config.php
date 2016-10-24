@@ -6,14 +6,14 @@
     define('DB_CHARSET',       getenv('DB_CHARSET')       ?: 'utf8');
     define('DB_COLLATE',       getenv('DB_COLLATE')       ?: '');
 
-    define('AUTH_KEY',         getenv('AUTH_KEY')         ?: hash('sha256', DB_USER.DB_NAME.DB_PASSWORD.DB_HOST));
-    define('SECURE_AUTH_KEY',  getenv('SECURE_AUTH_KEY')  ?: hash('sha256', AUTH_KEY));
-    define('LOGGED_IN_KEY',    getenv('LOGGED_IN_KEY')    ?: hash('sha256', SECURE_AUTH_KEY));
-    define('NONCE_KEY',        getenv('NONCE_KEY')        ?: hash('sha256', LOGGED_IN_KEY));
-    define('AUTH_SALT',        getenv('AUTH_SALT')        ?: hash('sha256', NONCE_KEY));
-    define('SECURE_AUTH_SALT', getenv('SECURE_AUTH_SALT') ?: hash('sha256', AUTH_SALT));
-    define('LOGGED_IN_SALT',   getenv('LOGGED_IN_SALT')   ?: hash('sha256', SECURE_AUTH_SALT));
-    define('NONCE_SALT',       getenv('NONCE_SALT')       ?: hash('sha256', LOGGED_IN_SALT));
+    define('AUTH_KEY',         getenv('AUTH_KEY'));
+    define('SECURE_AUTH_KEY',  getenv('SECURE_AUTH_KEY'));
+    define('LOGGED_IN_KEY',    getenv('LOGGED_IN_KEY'));
+    define('NONCE_KEY',        getenv('NONCE_KEY'));
+    define('AUTH_SALT',        getenv('AUTH_SALT'));
+    define('SECURE_AUTH_SALT', getenv('SECURE_AUTH_SALT'));
+    define('LOGGED_IN_SALT',   getenv('LOGGED_IN_SALT'));
+    define('NONCE_SALT',       getenv('NONCE_SALT'));
 
     define('FS_METHOD',        getenv('FS_METHOD')        ?: 'direct');
 
