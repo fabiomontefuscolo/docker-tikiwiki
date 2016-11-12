@@ -1,13 +1,12 @@
 FROM montefuscolo/php
 MAINTAINER Fabio Montefuscolo <fabio.montefuscolo@gmail.com>
 
-RUN curl -o tiki-wiki.tar.gz 'http://ufpr.dl.sourceforge.net/project/tikiwiki/Tiki_12.x_Altair/12.9/tiki-12.9.tar.gz'
-RUN tar -C /var/www/html -zxvf  tiki-wiki.tar.gz --strip 1 \
-    && rm tiki-wiki.tar.gz
-
 WORKDIR /var/www/html/
 
-RUN { \
+RUN curl -o tiki-wiki.tar.gz 'http://ufpr.dl.sourceforge.net/project/tikiwiki/Tiki_12.x_Altair/12.9/tiki-12.9.tar.gz' \
+    && tar -C /var/www/html -zxvf  tiki-wiki.tar.gz --strip 1 \
+    && rm tiki-wiki.tar.gz \
+    && { \
         echo "<?php"; \
         echo "    \$db_tiki        = getenv('TIKI_DB_DRIVER') ?: 'mysql';"; \
         echo "    \$dbversion_tiki = getenv('TIKI_DB_VERSION') ?: '12.9';"; \
@@ -16,10 +15,9 @@ RUN { \
         echo "    \$pass_tiki      = getenv('TIKI_DB_PASS');"; \
         echo "    \$dbs_tiki       = getenv('TIKI_DB_NAME') ?: 'tikiwiki';"; \
         echo "    \$client_charset = 'utf8';"; \
-    } > db/local.php
-
-RUN /bin/bash htaccess.sh
-RUN chown -R root:root /var \
+    } > /var/www/html/db/local.php \
+    && /bin/bash htaccess.sh \
+    && chown -R root:root /var \
     && find /var/www/html -type f -exec chmod 644 {} \; \
     && find /var/www/html -type d -exec chmod 755 {} \; \
     && chown -R www-data db \
@@ -35,7 +33,7 @@ RUN chown -R root:root /var \
     && chown -R www-data templates_c \
     && chown -R www-data whelp
 
-COPY docker-entrypoint.sh /entrypoint.sh
+COPY entrypoint.sh /entrypoint.sh
 
 VOLUME ["/var/www/html/files/", "/var/www/html/img/wiki/", "/var/www/html/img/wiki_up/", "/var/www/html/img/trackers/"]
 
