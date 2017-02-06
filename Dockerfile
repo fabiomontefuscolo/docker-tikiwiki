@@ -3,13 +3,13 @@ MAINTAINER Fabio Montefuscolo <fabio.montefuscolo@gmail.com>
 
 WORKDIR /var/www/html/
 
-RUN curl -o tiki-wiki.tar.gz 'http://ufpr.dl.sourceforge.net/project/tikiwiki/Tiki_12.x_Altair/12.9/tiki-12.9.tar.gz' \
+RUN curl -o tiki-wiki.tar.gz 'http://ufpr.dl.sourceforge.net/project/tikiwiki/Tiki_12.x_Altair/12.10/tiki-12.10.tar.gz' \
     && tar -C /var/www/html -zxvf  tiki-wiki.tar.gz --strip 1 \
     && rm tiki-wiki.tar.gz \
     && { \
         echo "<?php"; \
         echo "    \$db_tiki        = getenv('TIKI_DB_DRIVER') ?: 'mysql';"; \
-        echo "    \$dbversion_tiki = getenv('TIKI_DB_VERSION') ?: '12.9';"; \
+        echo "    \$dbversion_tiki = getenv('TIKI_DB_VERSION') ?: '12.10';"; \
         echo "    \$host_tiki      = getenv('TIKI_DB_HOST') ?: 'db';"; \
         echo "    \$user_tiki      = getenv('TIKI_DB_USER');"; \
         echo "    \$pass_tiki      = getenv('TIKI_DB_PASS');"; \
