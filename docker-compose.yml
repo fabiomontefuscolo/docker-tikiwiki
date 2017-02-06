@@ -1,0 +1,38 @@
+version: '2'
+
+services:
+  tiki:
+    image: montefuscolo/tiki-wiki
+    container_name: tiki_server
+    volumes:
+      - ./conf/memcached.ini:/usr/local/etc/php/conf.d/memcached.ini
+    environment:
+      - TIKI_DB_USER=tiki
+      - TIKI_DB_PASS=wiki
+      - TIKI_DB_NAME=tikiwiki
+    ports:
+      - 80:80
+      - 443:443
+    networks:
+      - tikinet
+
+  memcached:
+    image: memcached
+    container_name: tiki_sessions
+    networks:
+      - tikinet
+
+  db:
+    image: mariadb
+    container_name: tiki_db
+    environment:
+      - MYSQL_USER=tiki
+      - MYSQL_PASSWORD=wiki
+      - MYSQL_DATABASE=tikiwiki
+      - MYSQL_ROOT_PASSWORD=tkwkiiii
+      - TERM=dumb
+    networks:
+      - tikinet
+
+networks:
+  tikinet:
