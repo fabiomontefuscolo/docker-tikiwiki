@@ -8,7 +8,7 @@ RUN curl -o tiki-wiki.tar.gz 'http://ufpr.dl.sourceforge.net/project/tikiwiki/Ti
     && rm tiki-wiki.tar.gz \
     && { \
         echo "<?php"; \
-        echo "    \$db_tiki        = getenv('TIKI_DB_DRIVER') ?: 'mysql';"; \
+        echo "    \$db_tiki        = getenv('TIKI_DB_DRIVER') ?: 'mysqli';"; \
         echo "    \$dbversion_tiki = getenv('TIKI_DB_VERSION') ?: '16.2';"; \
         echo "    \$host_tiki      = getenv('TIKI_DB_HOST') ?: 'db';"; \
         echo "    \$user_tiki      = getenv('TIKI_DB_USER');"; \
