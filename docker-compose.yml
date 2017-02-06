@@ -2,7 +2,7 @@ version: '2'
 
 services:
   tiki:
-    image: montefuscolo/tiki-wiki
+    image: montefuscolo/tiki-wiki:16x
     container_name: tiki_server
     volumes:
       - ./conf/memcached.ini:/usr/local/etc/php/conf.d/memcached.ini
