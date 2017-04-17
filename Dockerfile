@@ -3,7 +3,12 @@ MAINTAINER Fabio Montefuscolo <fabio.montefuscolo@gmail.com>
 
 WORKDIR /var/www/html/
 
-RUN curl -o tiki-wiki.tar.gz 'http://ufpr.dl.sourceforge.net/project/tikiwiki/Tiki_16.x_Tabbys/16.2/tiki-16.2.tar.gz' \
+RUN apt-get update && apt-get install -y libldb-dev libldap2-dev \
+    && ln -s /usr/lib/x86_64-linux-gnu/libldap.so /usr/lib/libldap.so \
+    && ln -s /usr/lib/x86_64-linux-gnu/liblber.so /usr/lib/liblber.so \
+    && docker-php-ext-install ldap \
+    && echo "extension=ldap.so" > /usr/local/etc/php/conf.d/docker-php-ext-ldap.ini \
+    && curl -o tiki-wiki.tar.gz 'http://ufpr.dl.sourceforge.net/project/tikiwiki/Tiki_16.x_Tabbys/16.2/tiki-16.2.tar.gz' \
     && tar -C /var/www/html -zxvf  tiki-wiki.tar.gz --strip 1 \
     && rm tiki-wiki.tar.gz \
     && { \
@@ -30,12 +35,17 @@ RUN curl -o tiki-wiki.tar.gz 'http://ufpr.dl.sourceforge.net/project/tikiwiki/Ti
     && chown -R www-data /var/www/html/temp/cache/ \
     && chown -R www-data /var/www/html/templates/ \
     && chown -R www-data /var/www/html/templates_c/ \
-    && chown -R www-data /var/www/html/whelp/
+    && chown -R www-data /var/www/html/whelp/ \
+    && rm -rf /var/lib/apt/lists/* \
+    && rm -rf /tmp/*
 
 
-COPY entrypoint.sh /entrypoint.sh
-VOLUME ["/var/www/html/files/", "/var/www/html/img/wiki/", "/var/www/html/img/wiki_up/", "/var/www/html/img/trackers/"]
+VOLUME [                           \
+    "/var/www/html/files/",        \
+    "/var/www/html/img/wiki/",     \
+    "/var/www/html/img/wiki_up/",  \
+    "/var/www/html/img/trackers/"  \
+]
 
 EXPOSE 80 443
-ENTRYPOINT ["/entrypoint.sh"]
 CMD ["apache2-foreground"]
