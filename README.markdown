@@ -12,7 +12,7 @@ Actually, no tags are being used to this container. The tiki version available
 inside container is the LTS 12.9. You can pull like below.
 
 ```
-docker pull montefuscolo/tiki-wiki
+docker pull montefuscolo/tikiwiki
 ```
 
 
@@ -39,6 +39,6 @@ docker run --rm --name tiki --link mariadb:db \
     -e TIKI_DB_USER=tiki \
     -e TIKI_DB_PASS=wiki \
     -p 80:80 \
-    -d montefuscolo/tiki-wiki
+    -d montefuscolo/tikiwiki
 ```
 
