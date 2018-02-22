@@ -8,13 +8,13 @@ RUN apt-get update && apt-get install -y libldb-dev libldap2-dev \
     && ln -s /usr/lib/x86_64-linux-gnu/liblber.so /usr/lib/liblber.so \
     && docker-php-ext-install ldap mysql pdo_mysql \
     && echo "extension=ldap.so" > /usr/local/etc/php/conf.d/docker-php-ext-ldap.ini \
-    && curl -o tiki-wiki.tar.gz 'https://ufpr.dl.sourceforge.net/project/tikiwiki/Tiki_17.x_Zeta_Bootis/17.1/tiki-17.1.tar.gz' \
+    && curl -o tiki-wiki.tar.gz 'https://ufpr.dl.sourceforge.net/project/tikiwiki/Tiki_18.x_Alcyone/18.0/tiki-18.0.tar.gz' \
     && tar -C /var/www/html -zxvf  tiki-wiki.tar.gz --strip 1 \
     && rm tiki-wiki.tar.gz \
     && { \
         echo "<?php"; \
         echo "    \$db_tiki        = getenv('TIKI_DB_DRIVER') ?: 'mysqli';"; \
-        echo "    \$dbversion_tiki = getenv('TIKI_DB_VERSION') ?: '17';"; \
+        echo "    \$dbversion_tiki = getenv('TIKI_DB_VERSION') ?: '18';"; \
         echo "    \$host_tiki      = getenv('TIKI_DB_HOST') ?: 'db';"; \
         echo "    \$user_tiki      = getenv('TIKI_DB_USER');"; \
         echo "    \$pass_tiki      = getenv('TIKI_DB_PASS');"; \
