@@ -1,16 +1,13 @@
-FROM hacklab/php
+FROM montefuscolo/php:5-apache
 MAINTAINER Fabio Montefuscolo <fabio.montefuscolo@gmail.com>
 
-WORKDIR /var/www/html/
+ARG TIKI_SOURCE="https://gitlab.com/tikiwiki/tiki/-/archive/17.x/tiki-17.x.tar.gz"
+ARG TIKI_HTDOCS="/var/www/html"
+WORKDIR "${TIKI_HTDOCS}"
 
-RUN apt-get update && apt-get install -y libldb-dev libldap2-dev \
-    && ln -s /usr/lib/x86_64-linux-gnu/libldap.so /usr/lib/libldap.so \
-    && ln -s /usr/lib/x86_64-linux-gnu/liblber.so /usr/lib/liblber.so \
-    && docker-php-ext-install ldap mysql pdo_mysql \
-    && echo "extension=ldap.so" > /usr/local/etc/php/conf.d/docker-php-ext-ldap.ini \
-    && curl -o tiki-wiki.tar.gz 'https://ufpr.dl.sourceforge.net/project/tikiwiki/Tiki_17.x_Zeta_Bootis/17.1/tiki-17.1.tar.gz' \
-    && tar -C /var/www/html -zxvf  tiki-wiki.tar.gz --strip 1 \
-    && rm tiki-wiki.tar.gz \
+RUN curl -o tiki.tar.gz -L "${TIKI_SOURCE}" \
+    && tar -C ${TIKI_HTDOCS} -zxf tiki.tar.gz --strip 1 \
+    && rm tiki.tar.gz \
     && { \
         echo "<?php"; \
         echo "    \$db_tiki        = getenv('TIKI_DB_DRIVER') ?: 'mysqli';"; \
@@ -20,30 +17,31 @@ RUN apt-get update && apt-get install -y libldb-dev libldap2-dev \
         echo "    \$pass_tiki      = getenv('TIKI_DB_PASS');"; \
         echo "    \$dbs_tiki       = getenv('TIKI_DB_NAME') ?: 'tikiwiki';"; \
         echo "    \$client_charset = 'utf8';"; \
-    } > /var/www/html/db/local.php \
+    } > ${TIKI_HTDOCS}/db/local.php \
     && /bin/bash htaccess.sh \
+    && composer install --working-dir ${TIKI_HTDOCS}/vendor_bundled --prefer-dist \
     && chown -R root:root /var \
-    && find /var/www/html -type f -exec chmod 644 {} \; \
-    && find /var/www/html -type d -exec chmod 755 {} \; \
-    && chown -R www-data /var/www/html/db/ \
-    && chown -R www-data /var/www/html/dump/ \
-    && chown -R www-data /var/www/html/img/trackers/ \
-    && chown -R www-data /var/www/html/img/wiki/ \
-    && chown -R www-data /var/www/html/img/wiki_up/ \
-    && chown -R www-data /var/www/html/modules/cache/ \
-    && chown -R www-data /var/www/html/temp/ \
-    && chown -R www-data /var/www/html/temp/cache/ \
-    && chown -R www-data /var/www/html/temp/templates_c/ \
-    && chown -R www-data /var/www/html/templates/ \
+    && find ${TIKI_HTDOCS} -type f -exec chmod 644 {} \; \
+    && find ${TIKI_HTDOCS} -type d -exec chmod 755 {} \; \
+    && chown -R www-data ${TIKI_HTDOCS}/db/ \
+    && chown -R www-data ${TIKI_HTDOCS}/dump/ \
+    && chown -R www-data ${TIKI_HTDOCS}/img/trackers/ \
+    && chown -R www-data ${TIKI_HTDOCS}/img/wiki/ \
+    && chown -R www-data ${TIKI_HTDOCS}/img/wiki_up/ \
+    && chown -R www-data ${TIKI_HTDOCS}/modules/cache/ \
+    && chown -R www-data ${TIKI_HTDOCS}/temp/ \
+    && chown -R www-data ${TIKI_HTDOCS}/temp/cache/ \
+    && chown -R www-data ${TIKI_HTDOCS}/temp/templates_c/ \
+    && chown -R www-data ${TIKI_HTDOCS}/templates/ \
     && rm -rf /var/lib/apt/lists/* \
     && rm -rf /tmp/*
 
 
-VOLUME [                           \
-    "/var/www/html/files/",        \
-    "/var/www/html/img/wiki/",     \
-    "/var/www/html/img/wiki_up/",  \
-    "/var/www/html/img/trackers/"  \
+VOLUME [                            \
+    "${TIKI_HTDOCS}/files/",        \
+    "${TIKI_HTDOCS}/img/wiki/",     \
+    "${TIKI_HTDOCS}/img/wiki_up/",  \
+    "${TIKI_HTDOCS}/img/trackers/"  \
 ]
 
 EXPOSE 80 443
