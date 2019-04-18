@@ -6,7 +6,7 @@ find more useful information at http://tiki.org
 ## Pulling
 
 ```
-docker pull montefuscolo/tikiwiki:19x
+docker pull montefuscolo/tikiwiki:19.x
 ```
 
 ## Running
@@ -48,7 +48,7 @@ The following creates and start two containers:
 version: '2'
 services:
   tiki:
-    image: montefuscolo/tikiwiki:19x
+    image: montefuscolo/tikiwiki:19.x
     ports:
     - "80:80"
     depends_on:
@@ -101,7 +101,7 @@ services:
       DNS_ENABLED: "true"
       LOG_LEVEL: "info"
   tiki:
-    image: montefuscolo/tikiwiki:19x
+    image: montefuscolo/tikiwiki:19.x
     depends_on:
       - db
     deploy:
