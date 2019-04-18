@@ -1,38 +1,49 @@
-version: '2'
+version: '3.7'
 
 services:
+  haproxy:
+    image: eeacms/haproxy
+    depends_on:
+    - tiki
+    ports:
+    - "80:5000"
+    environment:
+      BACKENDS: "tiki"
+      DNS_ENABLED: "true"
+      LOG_LEVEL: "info"
   tiki:
-    image: montefuscolo/tiki-wiki:16x
-    container_name: tiki_server
-    volumes:
-      - ./conf/memcached.ini:/usr/local/etc/php/conf.d/memcached.ini
+    image: montefuscolo/tikiwiki:19x
+    depends_on:
+      - db
+    deploy:
+      replicas: 2
     environment:
       - TIKI_DB_USER=tiki
       - TIKI_DB_PASS=wiki
       - TIKI_DB_NAME=tikiwiki
-    ports:
-      - 80:80
-      - 443:443
-    networks:
-      - tikinet
-
-  memcached:
-    image: memcached
-    container_name: tiki_sessions
-    networks:
-      - tikinet
-
+    volumes:
+      - tiki_files:/var/www/html/files/
+      - tiki_img_trackers:/var/www/html/img/trackers/
+      - tiki_img_wiki_up:/var/www/html/img/wiki_up/
+      - tiki_img_wiki:/var/www/html/img/wiki/
+      - tiki_modules_cache:/var/www/html/modules/cache/
+      - tiki_storage:/var/www/html/storage/
+      - tiki_temp:/var/www/html/temp/
+      - tiki_sessions:/var/www/sessions/
   db:
     image: mariadb
-    container_name: tiki_db
     environment:
       - MYSQL_USER=tiki
       - MYSQL_PASSWORD=wiki
       - MYSQL_DATABASE=tikiwiki
       - MYSQL_ROOT_PASSWORD=tkwkiiii
       - TERM=dumb
-    networks:
-      - tikinet
-
-networks:
-  tikinet:
+volumes:
+  tiki_files:
+  tiki_img_trackers:
+  tiki_img_wiki_up:
+  tiki_img_wiki:
+  tiki_modules_cache:
+  tiki_storage:
+  tiki_temp:
+  tiki_sessions:
