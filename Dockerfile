@@ -1,7 +1,7 @@
 FROM montefuscolo/php:7.1-apache
 MAINTAINER Fabio Montefuscolo <fabio.montefuscolo@gmail.com>
 
-ARG TIKI_SOURCE="https://gitlab.com/tikiwiki/tiki/-/archive/19.x/tiki-19.x.tar.gz"
+ARG TIKI_SOURCE="https://gitlab.com/tikiwiki/tiki/-/archive/17.x/tiki-17.x.tar.gz"
 WORKDIR "/var/www/html"
 
 # If you have https_proxy with SslBump, place it's cetificate
@@ -20,7 +20,7 @@ RUN echo "${HTTPS_PROXY_CERT}" > /usr/local/share/ca-certificates/https_proxy.cr
 RUN { \
         echo "<?php"; \
         echo "    \$db_tiki        = getenv('TIKI_DB_DRIVER') ?: 'mysqli';"; \
-        echo "    \$dbversion_tiki = getenv('TIKI_DB_VERSION') ?: '19';"; \
+        echo "    \$dbversion_tiki = getenv('TIKI_DB_VERSION') ?: '17';"; \
         echo "    \$host_tiki      = getenv('TIKI_DB_HOST') ?: 'db';"; \
         echo "    \$user_tiki      = getenv('TIKI_DB_USER');"; \
         echo "    \$pass_tiki      = getenv('TIKI_DB_PASS');"; \

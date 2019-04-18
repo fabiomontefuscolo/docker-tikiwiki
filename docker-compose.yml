@@ -12,7 +12,7 @@ services:
       DNS_ENABLED: "true"
       LOG_LEVEL: "info"
   tiki:
-    image: montefuscolo/tikiwiki:19x
+    image: montefuscolo/tikiwiki:17.x
     depends_on:
       - db
     deploy:
