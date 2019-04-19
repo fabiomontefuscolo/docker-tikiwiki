@@ -1,4 +1,4 @@
-FROM montefuscolo/php:7.1-apache
+FROM montefuscolo/php:5-apache
 MAINTAINER Fabio Montefuscolo <fabio.montefuscolo@gmail.com>
 
 ARG TIKI_SOURCE="https://gitlab.com/tikiwiki/tiki/-/archive/17.x/tiki-17.x.tar.gz"
