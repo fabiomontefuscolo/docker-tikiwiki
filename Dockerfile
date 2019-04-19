@@ -16,9 +16,8 @@ RUN echo "${HTTPS_PROXY_CERT}" > /usr/local/share/ca-certificates/https_proxy.cr
     && composer install --working-dir /var/www/html/vendor_bundled --prefer-dist \
     && rm tiki.tar.gz \
     && rm -rf /var/lib/apt/lists/* \
-    && rm -rf /tmp/*
-
-RUN { \
+    && rm -rf /tmp/* \
+    && { \
         echo "<?php"; \
         echo "    \$db_tiki        = getenv('TIKI_DB_DRIVER') ?: 'mysqli';"; \
         echo "    \$dbversion_tiki = getenv('TIKI_DB_VERSION') ?: '18';"; \
