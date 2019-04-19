@@ -11,7 +11,8 @@ ARG HTTPS_PROXY_CERT=""
 RUN echo "${HTTPS_PROXY_CERT}" > /usr/local/share/ca-certificates/https_proxy.crt \
     && update-ca-certificates \
     && curl -o tiki.tar.gz -L "${TIKI_SOURCE}" \
-    && tar -C /var/www/html -zxf tiki.tar.gz --strip 1 \
+    && chown root: /var/www/html \
+    && tar -C /var/www/html --no-same-owner -zxf tiki.tar.gz --strip 1 \
     && composer install --working-dir /var/www/html/vendor_bundled --prefer-dist \
     && rm tiki.tar.gz \
     && rm -rf /var/lib/apt/lists/* \
@@ -31,11 +32,8 @@ RUN { \
         echo "session.save_path=/var/www/sessions"; \
     }  > /usr/local/etc/php/conf.d/tiki_session.ini \
     && /bin/bash htaccess.sh \
-    && chown -R root:root /var \
     && mkdir -p /var/www/sessions \
     && chown -R www-data /var/www/sessions \
-    && find /var/www/html -type f -exec chmod 644 {} \; \
-    && find /var/www/html -type d -exec chmod 755 {} \; \
     && chown -R www-data /var/www/html/db/ \
     && chown -R www-data /var/www/html/dump/ \
     && chown -R www-data /var/www/html/img/trackers/ \
