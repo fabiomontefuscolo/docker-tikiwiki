@@ -1,5 +1,6 @@
-FROM montefuscolo/php:5-apache
-MAINTAINER Fabio Montefuscolo <fabio.montefuscolo@gmail.com>
+FROM tikiwiki/php:5-apache
+
+LABEL mantainer "TikiWiki <tikiwiki-devel@lists.sourceforge.net>"
 
 ARG TIKI_SOURCE="https://gitlab.com/tikiwiki/tiki/-/archive/17.x/tiki-17.x.tar.gz"
 WORKDIR "/var/www/html"

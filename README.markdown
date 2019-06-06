@@ -6,7 +6,7 @@ find more useful information at http://tiki.org
 ## Pulling
 
 ```
-docker pull montefuscolo/tikiwiki:17.x
+docker pull tikiwiki/tikiwiki:17.x
 ```
 
 ## Running
@@ -34,7 +34,7 @@ docker run --rm --name tiki --link mariadb:db \
     -e TIKI_DB_USER=tiki \
     -e TIKI_DB_PASS=wiki \
     -p 80:80 \
-    -d montefuscolo/tikiwiki
+    -d tikiwiki/tikiwiki
 ```
 
 ### docker-compose
@@ -48,7 +48,7 @@ The following creates and start two containers:
 version: '2'
 services:
   tiki:
-    image: montefuscolo/tikiwiki:17.x
+    image: tikiwiki/tikiwiki:17.x
     ports:
     - "80:80"
     depends_on:
@@ -101,7 +101,7 @@ services:
       DNS_ENABLED: "true"
       LOG_LEVEL: "info"
   tiki:
-    image: montefuscolo/tikiwiki:17.x
+    image: tikiwiki/tikiwiki:17.x
     depends_on:
       - db
     deploy:
