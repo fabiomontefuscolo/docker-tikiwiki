@@ -1,4 +1,4 @@
-FROM tikiwiki/php:7.1-apache
+FROM tikiwiki/php:7.2-apache
 
 LABEL mantainer "TikiWiki <tikiwiki-devel@lists.sourceforge.net>"
 
