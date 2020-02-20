@@ -1,7 +1,7 @@
 FROM tikiwiki/php:7.2-apache
 LABEL mantainer "TikiWiki <tikiwiki-devel@lists.sourceforge.net>"
 
-ARG TIKI_SOURCE="https://gitlab.com/tikiwiki/tiki/-/archive/master/tiki-master.tar.gz"
+ARG TIKI_SOURCE="https://gitlab.com/tikiwiki/tiki/-/archive/21.x/tiki-21.x.tar.gz"
 WORKDIR "/var/www/html"
 
 RUN curl -o tiki.tar.gz -L "${TIKI_SOURCE}" \
