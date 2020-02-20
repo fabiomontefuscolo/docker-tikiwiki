@@ -4,13 +4,7 @@ LABEL mantainer "TikiWiki <tikiwiki-devel@lists.sourceforge.net>"
 ARG TIKI_SOURCE="https://gitlab.com/tikiwiki/tiki/-/archive/19.x/tiki-19.x.tar.gz"
 WORKDIR "/var/www/html"
 
-# If you have https_proxy with SslBump, place it's cetificate
-# in this variable to have curl and composer content cached
-ARG HTTPS_PROXY_CERT=""
-
-RUN echo "${HTTPS_PROXY_CERT}" > /usr/local/share/ca-certificates/https_proxy.crt \
-    && update-ca-certificates \
-    && curl -o tiki.tar.gz -L "${TIKI_SOURCE}" \
+RUN curl -o tiki.tar.gz -L "${TIKI_SOURCE}" \
     && chown root: /var/www/html \
     && tar -C /var/www/html --no-same-owner -zxf tiki.tar.gz --strip 1 \
     && composer global require hirak/prestissimo \
