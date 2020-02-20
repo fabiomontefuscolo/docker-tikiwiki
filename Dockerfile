@@ -8,7 +8,9 @@ RUN curl -o tiki.tar.gz -L "${TIKI_SOURCE}" \
     && chown root: /var/www/html \
     && tar -C /var/www/html --no-same-owner -zxf tiki.tar.gz --strip 1 \
     && composer global require hirak/prestissimo \
-    && composer install --working-dir /var/www/html/vendor_bundled --prefer-dist \
+    && php \
+        -d zend_extension=$(find /usr/local/lib/php/extensions/ -name xdebug.so) \
+        /usr/local/bin/composer install --working-dir /var/www/html/vendor_bundled --prefer-dist \
     && rm tiki.tar.gz \
     && rm -rf /var/lib/apt/lists/* \
     && rm -rf /tmp/* \ 
