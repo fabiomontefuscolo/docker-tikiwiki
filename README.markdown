@@ -6,7 +6,7 @@ find more useful information at http://tiki.org
 ## Pulling
 
 ```
-docker pull tikiwiki/tikiwiki:19.x
+docker pull tikiwiki/tikiwiki:20.x
 ```
 
 ## Running
@@ -18,7 +18,7 @@ your configurations files inside container. The env vars and the default values
 are listed below and the names are self explanatory.
 
 ```
-TIKI_DB_VERSION=19
+TIKI_DB_VERSION=20
 TIKI_DB_HOST='db'
 TIKI_DB_USER
 TIKI_DB_PASS
@@ -48,7 +48,7 @@ The following creates and start two containers:
 version: '2'
 services:
   tiki:
-    image: tikiwiki/tikiwiki:19.x
+    image: tikiwiki/tikiwiki:20.x
     ports:
     - "80:80"
     depends_on:
@@ -101,7 +101,7 @@ services:
       DNS_ENABLED: "true"
       LOG_LEVEL: "info"
   tiki:
-    image: tikiwiki/tikiwiki:19.x
+    image: tikiwiki/tikiwiki:20.x
     depends_on:
       - db
     deploy:
