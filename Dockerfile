@@ -1,15 +1,16 @@
+FROM alpine/git AS downloader
+RUN mkdir -p /var/www \
+    && git clone --depth 1 --branch=18.x https://gitlab.com/tikiwiki/tiki.git /var/www/html
+
+
 FROM tikiwiki/php:7.2-apache
 LABEL mantainer "TikiWiki <tikiwiki-devel@lists.sourceforge.net>"
 
-ARG TIKI_SOURCE="https://gitlab.com/tikiwiki/tiki/-/archive/18.x/tiki-18.x.tar.gz"
+COPY --from=downloader /var/www/html /var/www/html
 WORKDIR "/var/www/html"
 
-RUN curl -o tiki.tar.gz -L "${TIKI_SOURCE}" \
-    && chown root: /var/www/html \
-    && tar -C /var/www/html --no-same-owner -zxf tiki.tar.gz --strip 1 \
-    && composer global require hirak/prestissimo \
+RUN composer global require hirak/prestissimo \
     && composer install --working-dir /var/www/html/vendor_bundled --prefer-dist \
-    && rm tiki.tar.gz \
     && rm -rf /var/lib/apt/lists/* \
     && rm -rf /tmp/* \
     && rm -rf /root/.composer \
