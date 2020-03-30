@@ -25,12 +25,14 @@ RUN composer global require hirak/prestissimo \
         echo "    \$pass_tiki      = getenv('TIKI_DB_PASS');"; \
         echo "    \$dbs_tiki       = getenv('TIKI_DB_NAME') ?: 'tikiwiki';"; \
         echo "    \$client_charset = 'utf8mb4';"; \
+        echo "    foreach (glob('/var/www/conf.d/*.php') as \$conf) { include(\$conf); }"; \
     } > /var/www/html/db/local.php \
     && {\
         echo "session.save_path=/var/www/sessions"; \
     }  > /usr/local/etc/php/conf.d/tiki_session.ini \
     && /bin/bash htaccess.sh \
     && mkdir -p /var/www/sessions \
+    && mkdir -p /var/www/conf.d \
     && chown -R www-data /var/www/sessions \
     && chown -R www-data /var/www/html/db/ \
     && chown -R www-data /var/www/html/dump/ \
@@ -41,6 +43,6 @@ RUN composer global require hirak/prestissimo \
     && chown -R www-data /var/www/html/temp/ \
     && chown -R www-data /var/www/html/templates/
 
-VOLUME ["/var/www/html/files/","/var/www/html/img/trackers/","/var/www/html/img/wiki_up/","/var/www/html/img/wiki/","/var/www/html/modules/cache/","/var/www/html/storage/","/var/www/html/temp/","/var/www/sessions/"]
+VOLUME ["/var/www/conf.d/","/var/www/html/files/","/var/www/html/img/trackers/","/var/www/html/img/wiki_up/","/var/www/html/img/wiki/","/var/www/html/modules/cache/","/var/www/html/storage/","/var/www/html/temp/","/var/www/sessions/"]
 EXPOSE 80
 CMD ["apache2-foreground"]
